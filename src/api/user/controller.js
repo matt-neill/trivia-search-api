@@ -86,3 +86,23 @@ export const destroy = ({ params }, res, next) =>
     .then((user) => user ? user.remove() : null)
     .then(success(res, 204))
     .catch(next)
+
+export const signUp = ({ bodymen: { body }}, res, next) => 
+  User.create(body)
+    .then(user => {
+      sign(user.id)
+        .then((token) => ({ token, user: user.view(true) }))
+        .then(success(res, 201))
+    })
+    .catch((err) => {
+      /* istanbul ignore else */
+      if (err.name === 'MongoError' && err.code === 11000) {
+        res.status(409).json({
+          valid: false,
+          param: 'email',
+          message: 'email already registered'
+        })
+      } else {
+        next(err)
+      }
+    })

@@ -35,7 +35,7 @@ const questionSchema = new Schema({
     type: String,
     validate: validators.isURL({
       message: 'Must be a Valid URL',
-      protocols: ['http','https','ftp'],
+      protocols: ['http','https'],
       require_tld: true,
       require_protocol: true
     }),
@@ -43,7 +43,7 @@ const questionSchema = new Schema({
   createdBy: { 
     type: Schema.Types.ObjectId,
     ref: 'User',
-    required: true,
+    // required: true,
   },
   lastUsed: {
     type: Date,
@@ -57,7 +57,7 @@ const questionSchema = new Schema({
   }
 })
 
-questionSchema.plugin(keywords, {paths: ['question', 'answer', 'options']});
+questionSchema.plugin(keywords, { paths: ['question', 'answer', 'options'] });
 
 questionSchema.methods = {
   view (full) {
