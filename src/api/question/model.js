@@ -1,32 +1,46 @@
-import mongoose, { Schema } from 'mongoose'
+import mongoose, { Schema } from 'mongoose';
 import keywords from 'mongoose-keywords';
 import validators from 'mongoose-validators';
 
 const questionSchema = new Schema({
   question: {
-    type: String
+    type: String,
   },
   answer: {
-    type: String
+    type: String,
   },
   category: {
-    type: String
+    type: String,
   },
   options: [
     {
-      type: String
-    }
+      type: String,
+    },
   ],
   media: {
-    type: String
+    name: {
+      type: String,
+    },
+    author: {
+      type: String,
+    },
+    image: {
+      type: String,
+    },
+    source: {
+      type: String,
+    },
+    url: {
+      type: String,
+    },
   },
   notes: {
-    type: String
+    type: String,
   },
   tags: [
     {
-      type: String
-    }
+      type: String,
+    },
   ],
   custom_category: {
     type: Boolean,
@@ -35,32 +49,32 @@ const questionSchema = new Schema({
     type: String,
     validate: validators.isURL({
       message: 'Must be a Valid URL',
-      protocols: ['http','https'],
+      protocols: ['http', 'https'],
       require_tld: true,
-      require_protocol: true
+      require_protocol: true,
     }),
   },
-  createdBy: { 
+  createdBy: {
     type: Schema.Types.ObjectId,
     ref: 'User',
     // required: true,
   },
   lastUsed: {
     type: Date,
-    default: Date.now
-  }
+    default: Date.now,
+  },
 }, {
   timestamps: true,
   toJSON: {
     virtuals: true,
-    transform: (obj, ret) => { delete ret._id }
-  }
-})
+    transform: (obj, ret) => { delete ret._id; },
+  },
+});
 
 questionSchema.plugin(keywords, { paths: ['question', 'answer', 'options'] });
 
 questionSchema.methods = {
-  view (full) {
+  view(full) {
     const view = {
       // simple view
       id: this.id,
@@ -75,17 +89,17 @@ questionSchema.methods = {
       source: this.source,
       createdBy: this.createdBy,
       createdAt: this.createdAt,
-      updatedAt: this.updatedAt
-    }
+      updatedAt: this.updatedAt,
+    };
 
     return full ? {
-      ...view
+      ...view,
       // add properties for a full view
-    } : view
-  }
-}
+    } : view;
+  },
+};
 
-const model = mongoose.model('Question', questionSchema)
+const model = mongoose.model('Question', questionSchema);
 
-export const schema = model.schema
-export default model
+export const { schema } = model;
+export default model;

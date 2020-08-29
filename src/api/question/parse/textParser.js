@@ -17,12 +17,14 @@ const textParser = ($, sectionQuestions, category) => {
     const lastBrackets = questionFull.match(/\(([^)]*)\)[^(]*$/);
     const question = questionText && questionText.length ? questionText.trim() : questionFull;
     const answer = lastBrackets && lastBrackets.length ? lastBrackets[1].trim() : null;
+    const notes = question.split(/http:\/\/|https:\/\//);
 
     return ({
       id: `${category.replace(/ /g, '').replace(/&/g, '+')}-${idx+1}`,
-      question: question,
-      answer: answer,
+      question: notes.length > 1 ? notes[0].replace(':', ' ').trim() : question,
+      answer,
       category: textCategories.includes(category) ? getCategory(idx, category) : category,
+      notes: notes.length > 1 ? notes[1] : null,
     })
   }).get();
 }
