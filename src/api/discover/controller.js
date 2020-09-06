@@ -2,6 +2,7 @@ import OpenTriviaAPI from 'opentdb-api';
 import { sign, verify } from '../../services/jwt';
 import { notFound } from '../../services/response';
 import { User } from '../user';
+import { Category } from '../category';
 
 const getErrorStatus = (code) => {
   switch (code) {
@@ -60,6 +61,27 @@ const checkToken = (user) => new Promise((resolve) => {
   }
 });
 
+const getCategoryTags = (trivia, opentdbCategoryId) => new Promise((resolve) => {
+  const catId = parseInt(opentdbCategoryId, 10);
+
+  Category.findOne({ opentriviadb_categories: { $in: catId } })
+    .then((categoryObj) => {
+      const category = categoryObj.view();
+      const formatted = trivia.map((question) => {
+        const tags = question.category.split(/[&:]/).map((tag) => tag.toLowerCase().trim());
+
+        // eslint-disable-next-line no-param-reassign
+        delete question.category;
+        return {
+          category,
+          tags,
+          ...question,
+        };
+      });
+      resolve(formatted);
+    });
+});
+
 export const index = ({ querymen: { query, cursor }, user }, res, next) => checkToken(user, res)
   .then((newToken) => {
     if (newToken) {
@@ -81,6 +103,7 @@ export const index = ({ querymen: { query, cursor }, user }, res, next) => check
     return options;
   })
   .then((options) => OpenTriviaAPI.getTrivia(options))
+  .then((trivia) => getCategoryTags(trivia, query.category))
   .then((trivia) => res.status(200).json(trivia))
   .catch((err) => {
     const error = parseError(err.message);

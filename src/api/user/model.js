@@ -38,6 +38,20 @@ const userSchema = new Schema({
     type: String,
     default: null,
   },
+  flags: {
+    user_beta: {
+      type: Boolean,
+      default: false,
+    },
+    feature_upload_doc: {
+      type: Boolean,
+      default: false,
+    },
+    feature_mutli_add: {
+      type: Boolean,
+      default: false,
+    },
+  },
 }, {
   timestamps: true,
 });
@@ -73,7 +87,7 @@ userSchema.methods = {
     let fields = ['id', 'name', 'picture'];
 
     if (full) {
-      fields = [...fields, 'email', 'opentdb_token', 'createdAt'];
+      fields = [...fields, 'email', 'opentdb_token', 'createdAt', 'flags'];
     }
 
     fields.forEach((field) => { view[field] = this[field]; });

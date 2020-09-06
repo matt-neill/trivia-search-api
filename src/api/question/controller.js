@@ -38,7 +38,7 @@ export const index = ({ querymen: { query, select, cursor }, user }, res, next) 
   return Question.count(query)
     .then((count) => Question.find(query, select, cursor)
       .populate('createdBy', 'name picture')
-      .populate('category', 'name id color')
+      .populate('category', 'name id slug')
       .then((questions) => ({
         count,
         rows: questions.map((question) => question.view()),

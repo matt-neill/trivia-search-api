@@ -5,18 +5,8 @@ const categorySchema = new Schema({
   name: {
     type: String,
   },
-  subcategories: [
-    {
-      type: Schema.Types.ObjectId,
-      ref: 'Category',
-    },
-  ],
   slug: {
     type: String,
-  },
-  color: {
-    type: String,
-    default: '#F4F6F8',
   },
   media: {
     icon: {
@@ -56,14 +46,9 @@ const categorySchema = new Schema({
   sortOrder: {
     type: Number,
   },
-  opentriviadb: {
-    id: {
-      type: Number,
-    },
-    name: {
-      type: String,
-    },
-  },
+  opentriviadb_categories: [{
+    type: Number,
+  }],
 }, {
   timestamps: true,
 });
@@ -78,18 +63,16 @@ categorySchema.methods = {
         thumbnail: this.media.thumbnail,
       },
       slug: this.slug,
-      color: this.color,
-      subcategories: this.subcategories,
-      isCustomCategory: this.isCustomCategory,
-      showInFilters: this.showInFilters,
       sortOrder: this.sortOrder,
-      opentriviadb: this.opentriviadb,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt,
     };
 
     return full ? {
       ...view,
+      isCustomCategory: this.isCustomCategory,
+      showInFilters: this.showInFilters,
+      opentriviadb_categories: this.opentriviadb_categories,
       // add properties for a full view
     } : view;
   },
