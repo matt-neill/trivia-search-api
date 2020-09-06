@@ -34,6 +34,10 @@ const userSchema = new Schema({
     type: String,
     trim: true,
   },
+  opentdb_token: {
+    type: String,
+    default: null,
+  },
 }, {
   timestamps: true,
 });
@@ -69,7 +73,7 @@ userSchema.methods = {
     let fields = ['id', 'name', 'picture'];
 
     if (full) {
-      fields = [...fields, 'email', 'createdAt'];
+      fields = [...fields, 'email', 'opentdb_token', 'createdAt'];
     }
 
     fields.forEach((field) => { view[field] = this[field]; });
