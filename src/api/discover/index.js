@@ -32,7 +32,7 @@ router.get('/',
       paths: ['type'],
     },
     limit: {
-      default: 10,
+      default: 6,
     },
   }),
   index);

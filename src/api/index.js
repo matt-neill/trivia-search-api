@@ -3,6 +3,7 @@ import user from './user'
 import auth from './auth'
 import question, { upload } from './question'
 import discover from './discover'
+import category from './category'
 
 const router = new Router()
 
@@ -33,5 +34,6 @@ router.use('/users', user)
 router.use('/auth', auth)
 router.use('/questions', question)
 router.use('/discover', discover)
+router.use('/categories', category)
 
 export default router
