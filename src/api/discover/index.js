@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { middleware as query } from 'querymen';
 import { token } from '../../services/passport';
-import { index, getCategories, resetToken } from './controller';
+import { index, getCategories, resetToken, getBalancedQuestions } from './controller';
 
 const router = new Router();
 
@@ -36,6 +36,27 @@ router.get('/',
     },
   }),
   index);
+
+router.get('/balanced',
+  token({ required: true }),
+  query({
+    category: {
+      type: String,
+      paths: ['category'],
+    },
+    difficulty: {
+      type: String,
+      paths: ['difficulty'],
+    },
+    type: {
+      type: String,
+      paths: ['type'],
+    },
+    limit: {
+      default: 6,
+    },
+  }),
+  getBalancedQuestions);
 
 /**
  * @api {get} /discover/:id Retrieve discover

@@ -3,7 +3,7 @@ import { middleware as query } from 'querymen';
 import { middleware as body } from 'bodymen';
 import { token } from '../../services/passport';
 import {
-  create, index, show, update, destroy,
+  create, index, show, update, destroy, showBySlug,
 } from './controller';
 import { schema } from './model';
 
@@ -61,6 +61,11 @@ router.get('/',
  * @apiError 404 Category not found.
  * @apiError 401 user access only.
  */
+
+router.get('/slug/:id',
+token({ required: true }),
+showBySlug);
+
 router.get('/:id',
   token({ required: true }),
   show);

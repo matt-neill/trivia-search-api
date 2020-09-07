@@ -21,6 +21,12 @@ export const show = ({ params }, res, next) => Category.findById(params.id)
   .then(success(res))
   .catch(next);
 
+export const showBySlug = ({ params }, res, next) => Category.findOne({ slug: params.id })
+  .then(notFound(res))
+  .then((category) => (category ? category.view() : null))
+  .then(success(res))
+  .catch(next);
+
 export const update = ({ bodymen: { body }, params }, res, next) => Category.findById(params.id)
   .then(notFound(res))
   .then((category) => (category ? _.merge(category, body).save() : null))
