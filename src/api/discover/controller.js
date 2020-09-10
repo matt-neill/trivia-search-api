@@ -22,10 +22,9 @@ const getErrorStatus = (code) => {
 
 const parseError = (opentdbError) => {
   if (opentdbError) {
-    const error = opentdbError.split(':');
+    const error = opentdbError.toString().replace('Error:', '').split(':');
     const responseCode = parseInt(error[0].replace('Response code', '').trim(), 10); // Response code 4
     const statusText = error[1] ? error[1].trim() : null;
-
     return {
       status: getErrorStatus(responseCode),
       responseCode,
@@ -73,7 +72,6 @@ const getCategoryTags = (trivia, opentdbCategoryId) => new Promise((resolve) => 
       const category = categoryObj && categoryObj.view();
       const formatted = trivia.map((question) => {
         const tags = question.category.split(/[&:]/).map((tag) => tag.toLowerCase().trim());
-
         // eslint-disable-next-line no-param-reassign
         delete question.category;
         return {
@@ -187,14 +185,51 @@ export const getBalancedQuestions = ({ querymen: { query, cursor }, user }, res)
       });
 
       // once api calls are complete, concat array and shuffle it
-      return Promise.all(promises).then((questions) => [].concat(...questions).map((question) => ({
-        ...question,
-        tags: question.category.split(/[&:]/).map((tag) => tag.toLowerCase().trim()),
-        category: query.category, // add the category ID so it can be saved to the db
-      })).sort(() => 0.5 - Math.random()));
+      return Promise.allSettled(promises)
+        .then((otdbQueries) => {
+          const allFailed = otdbQueries.every((otdbQuery) => otdbQuery.status === 'rejected');
+          if (allFailed) {
+            const error = parseError(otdbQueries[0].reason);
+            return res.status(error.status).send(error);
+          }
+          return otdbQueries
+            .filter((otdbQuery) => otdbQuery.status === 'fulfilled' && otdbQuery.value)
+            .map((otdbQuery) => otdbQuery.value);
+        })
+        .then((questions) => (questions && questions.length) && [].concat(...questions).map((question) => question && ({
+          ...question,
+          tags: question.category.split(/[&:]/).map((tag) => tag.toLowerCase().trim()),
+          category: query.category, // add the category ID so it can be saved to the db
+        }))
+          .sort(() => 0.5 - Math.random()));
     })
     .then((trivia) => res.status(200).json(trivia))
     .catch((err) => {
       const error = parseError(err.message);
       return res.status(error.status).send(error);
     }));
+
+// 9 General Knowledge
+// 10 Entertainment: Books
+// 11 Entertainment: Film
+// 12 Entertainment: Music
+// 13 Entertainment: Musicals & Theatres
+// 14 Entertainment: Television
+// 15 Entertainment: Video Games
+// 16 Entertainment: Board Games
+// 17 Science & Nature
+// 18 Science: Computers
+// 19 Science: Mathematics
+// 20 Mythology
+// 21 Sports
+// 22 Geography
+// 23 History
+// 24 Politics
+// 25 Art
+// 26 Celebrities
+// 27 Animals
+// 28 Vehicles
+// 29 Entertainment: Comics
+// 30 Science: Gadgets
+// 31 Entertainment: Japanese Anime & Manga
+// 32 Entertainment: Cartoon & Animations

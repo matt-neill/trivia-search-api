@@ -11,7 +11,7 @@ export Category, { schema } from './model';
 
 const router = new Router();
 const {
-  name, media, sortOrder, isCustomCategory, opentriviadb_categories, showInFilters,
+  name, media, sortOrder, isCustomCategory, opentriviadb_categories, active,
 } = schema.tree;
 
 /**
@@ -30,7 +30,7 @@ const {
 router.post('/',
   token({ required: true, roles: ['admin'] }),
   body({
-    name, media, sortOrder, isCustomCategory, opentriviadb_categories, showInFilters,
+    name, media, sortOrder, isCustomCategory, opentriviadb_categories, active,
   }),
   create);
 
@@ -63,8 +63,8 @@ router.get('/',
  */
 
 router.get('/slug/:id',
-token({ required: true }),
-showBySlug);
+  token({ required: true }),
+  showBySlug);
 
 router.get('/:id',
   token({ required: true }),
@@ -86,7 +86,7 @@ router.get('/:id',
 router.put('/:id',
   token({ required: true, roles: ['admin'] }),
   body({
-    name, media, sortOrder, isCustomCategory, opentriviadb_categories, showInFilters,
+    name, media, sortOrder, isCustomCategory, opentriviadb_categories, active,
   }),
   update);
 

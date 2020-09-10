@@ -35,7 +35,7 @@ const categorySchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'User',
   },
-  showInFilters: {
+  active: {
     type: Boolean,
     default: true,
   },
@@ -61,6 +61,7 @@ categorySchema.methods = {
       name: this.name,
       media: {
         thumbnail: this.media.thumbnail,
+        hero: this.media.hero,
       },
       slug: this.slug,
       sortOrder: this.sortOrder,
@@ -71,7 +72,7 @@ categorySchema.methods = {
     return full ? {
       ...view,
       isCustomCategory: this.isCustomCategory,
-      showInFilters: this.showInFilters,
+      active: this.active,
       opentriviadb_categories: this.opentriviadb_categories,
       // add properties for a full view
     } : view;

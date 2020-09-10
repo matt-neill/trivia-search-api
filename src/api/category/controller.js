@@ -10,10 +10,12 @@ export const create = ({ bodymen: { body }, user }, res, next) => Category.creat
   .then(success(res, 201))
   .catch(next);
 
-export const index = ({ querymen: { query, select, cursor } }, res, next) => Category.find(query, select, cursor)
-  .then((categories) => categories.map((category) => category.view()))
-  .then(success(res))
-  .catch(next);
+export const index = ({ querymen: { query, select, cursor } }, res, next) => (
+  Category.find({ active: true, ...query }, select, cursor)
+    .then((categories) => categories.map((category) => category.view()))
+    .then(success(res))
+    .catch(next)
+);
 
 export const show = ({ params }, res, next) => Category.findById(params.id)
   .then(notFound(res))
