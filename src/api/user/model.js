@@ -38,6 +38,9 @@ const userSchema = new Schema({
     type: String,
     default: null,
   },
+  opentdb_blacklisted: {
+    type: Array,
+  },
   flags: {
     user_beta: {
       type: Boolean,
@@ -87,7 +90,7 @@ userSchema.methods = {
     let fields = ['id', 'name', 'picture'];
 
     if (full) {
-      fields = [...fields, 'email', 'opentdb_token', 'createdAt', 'flags'];
+      fields = [...fields, 'email', 'opentdb_token', 'createdAt', 'flags', 'role'];
     }
 
     fields.forEach((field) => { view[field] = this[field]; });

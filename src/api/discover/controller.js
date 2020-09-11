@@ -117,6 +117,15 @@ export const getCategories = ({ params }, res, next) => OpenTriviaAPI.getCategor
 
 export const resetToken = ({ user }, res, next) => getTokenfromJwt(user)
   .then((token) => OpenTriviaAPI.resetToken(token))
+  .then((token) => {
+    User.findById(user.id)
+      .then(notFound(res))
+      .then((userObj) => (userObj ? Object.assign(userObj,
+        {
+          opentdb_blacklisted: [],
+        }).save() : null));
+    return token;
+  })
   .then((result) => res.status(200).json(result))
   .catch((err) => {
     const error = parseError(err.message);
@@ -126,7 +135,7 @@ export const resetToken = ({ user }, res, next) => getTokenfromJwt(user)
 export const getBalancedQuestions = ({ querymen: { query, cursor }, user }, res) => (
   checkToken(user, res)
     .then((newToken) => {
-      if (newToken) {
+      if (newToken) { // token has been refreshed, save in the db
         User.findById(user.id)
           .then(notFound(res))
           .then((userObj) => (userObj ? Object.assign(userObj,
@@ -135,7 +144,7 @@ export const getBalancedQuestions = ({ querymen: { query, cursor }, user }, res)
             }).save() : null));
         return verify(newToken);
       }
-      return verify(user.opentdb_token);
+      return verify(user.opentdb_token); // otherwise, just verify the existing token
     })
     .then((decodedToken) => {
       const options = {
@@ -149,10 +158,13 @@ export const getBalancedQuestions = ({ querymen: { query, cursor }, user }, res)
     })
     .then((options) => Category.findById(options.category) // get the requested cat from db
       .then((category) => new Promise((resolve) => {
-        const opentdbCategories = category.opentriviadb_categories; // get the linked otdb cats
+        let opentdbCategories = category.opentriviadb_categories; // get the linked otdb cats
+        if (user.opentdb_blacklisted && user.opentdb_blacklisted.length) {
+          opentdbCategories = opentdbCategories
+            .filter((categoryId) => !user.opentdb_blacklisted.includes(categoryId)); // filter out blacklisted ones
+        }
         // generate # of questions requested
         const categories = [...Array(options.amount)].map(() => {
-
           // get a random cat from linked otdb
           const randomCategory = Math.floor(Math.random() * opentdbCategories.length);
           const opentdbCategoryId = opentdbCategories[randomCategory];
@@ -187,8 +199,17 @@ export const getBalancedQuestions = ({ querymen: { query, cursor }, user }, res)
       // once api calls are complete, concat array and shuffle it
       return Promise.allSettled(promises)
         .then((otdbQueries) => {
+          const blacklisted = otdbQueries
+            .filter((otdbQuery) => otdbQuery.status === 'rejected')
+            .map((otdbQuery, idx) => options[idx].otdbCatId);
+          if (blacklisted && blacklisted.length) {
+            User.findById(user.id) // update user model with blacklisted cats
+              .then((userObj) => (userObj ? Object.assign(userObj, { opentdb_blacklisted: blacklisted }).save() : null));
+          }
+
           const allFailed = otdbQueries.every((otdbQuery) => otdbQuery.status === 'rejected');
           if (allFailed) {
+            console.log('all queries failed');
             const error = parseError(otdbQueries[0].reason);
             return res.status(error.status).send(error);
           }

@@ -51,6 +51,10 @@ const categorySchema = new Schema({
   }],
 }, {
   timestamps: true,
+  toJSON: {
+    virtuals: true,
+    transform: (obj, ret) => { delete ret._id; },
+  },
 });
 
 categorySchema.methods = {
