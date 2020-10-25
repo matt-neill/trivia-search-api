@@ -4,6 +4,7 @@ import auth from './auth'
 import question, { upload } from './question'
 import discover from './discover'
 import category from './category'
+import widget from './widget'
 
 const router = new Router()
 
@@ -35,5 +36,6 @@ router.use('/auth', auth)
 router.use('/questions', question)
 router.use('/discover', discover)
 router.use('/categories', category)
+router.use('/widget', widget)
 
 export default router
