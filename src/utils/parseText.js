@@ -3,13 +3,38 @@
 
 // const YouTube = new YouTubeAPI();
 
-const parseText = (questionFull) => {
+// const getOptions = (questionFull) => {
+//   const options = questionFull.split('a)');
+//   // console.log(questionFull);
+
+//   if (options.length > 1) {
+//     return options[1].split(/b\)|c\)|d\)/).map((str) => str.replace(/\t/, '').trim());
+//   }
+//   return [];
+// };
+
+// options = options.length > 1 ? options[1].split(/b\)|c\)|d\)/).map((str) => str.replace(/\t/, '').trim()) : [];
+// return options;
+
+const parseText = (questionFull, questionType) => {
+  // console.log()
   const questionText = questionFull.substr(0, questionFull.lastIndexOf('('));
   const lastBrackets = questionFull.match(/\(([^)]*)\)[^(]*$/);
   let question = questionText && questionText.length ? questionText.trim() : questionFull;
   const answer = lastBrackets && lastBrackets.length ? lastBrackets[1].trim() : null;
-  const getOptions = questionFull.split('a)');
-  const options = getOptions.length > 1 ? getOptions[1].split(/b\)|c\)|d\)/).map((str) => str.replace(/\t/, '').trim()) : [];
+  // console.log(questionType);
+
+  // let options = [];
+  // if (questionType === 'mc') {
+  //   options = getOptions(questionFull);
+  // }
+
+  // const getOptions = questionFull.split('a)');
+  // const getOptions = mcOptions();
+  // const options = getOptions.length > 1 ? getOptions[1].split(/b\)|c\)|d\)/).map((str) => str.replace(/\t/, '').trim()) : [];
+  
+  // const options = getOptions(questionFull);
+
   const mediaArr = question.match(/\bhttps?:\/\/\S+/gi);
   let media = {};
 
@@ -64,7 +89,7 @@ const parseText = (questionFull) => {
   return {
     question,
     answer,
-    options,
+    // options,
     media,
     notes: null,
   };

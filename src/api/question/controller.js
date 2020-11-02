@@ -105,13 +105,37 @@ export const parseMultiple = (req, res, next) => {
     category,
   } = req.body;
 
-  const categories = category.split('&').map((cat) => titleCase(cat).trim());
-  const questionsSplit = questions.split('\n');
-  let returnQuestions = [];
+  // const categories = category.split('&').map((cat) => titleCase(cat).trim());
+  let questionsSplit = questions.split('\n');
+  let options = [];
 
+  if (type === 'mc') {
+    const tempQuestions = [];
+
+    options = questionsSplit
+      .filter((question) => question && question.length > 0) // remove blank lines
+      .reduce((resultArray, item, questionIdx) => {
+        const optionArray = resultArray;
+        const chunkIndex = Math.floor(questionIdx / 5);
+        if (!optionArray[chunkIndex]) {
+          optionArray[chunkIndex] = []; // start a new chunk of 5
+        }
+        optionArray[chunkIndex].push(item);
+        return optionArray;
+      }, [])
+      .map((optionsArr) => {
+        const question = optionsArr.splice(0, 1);
+        tempQuestions.push(question[0]);
+        const alpha = ['a)', 'b)', 'c)', 'd)'];
+        return optionsArr.map((option, optIdx) => `${alpha[optIdx]} ${option}`);
+      });
+    questionsSplit = tempQuestions;
+  }
+
+  let returnQuestions = [];
   returnQuestions = questionsSplit.map((question, idx) => {
-    const isFirstHalf = idx >= Math.ceil(questionsSplit.length / 2) ? 1 : 0; // determine if question is in first half of array
-    const cat = type !== 'audio' ? categories[categories.length > 1 ? isFirstHalf : 0] : 'Audio Clip'; // set category name based off of array position
+    // const isFirstHalf = idx >= Math.ceil(questionsSplit.length / 2) ? 1 : 0; // determine if question is in first half of array
+    // const cat = type !== 'audio' ? categories[categories.length > 1 ? isFirstHalf : 0] : 'Audio Clip'; // set category name based off of array position
 
     // return parseText(question).then((questionObj) => {
     //   console.log(questionObj);
@@ -124,9 +148,10 @@ export const parseMultiple = (req, res, next) => {
     // })
 
     const questionObj = {
-      ...parseText(question),
+      ...parseText(question, type),
+      options: options[idx],
       id: idx,
-      category: cat,
+      category,
     };
     return questionObj;
   });
