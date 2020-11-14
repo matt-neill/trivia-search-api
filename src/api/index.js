@@ -5,6 +5,7 @@ import question, { upload } from './question'
 import discover from './discover'
 import category from './category'
 import widget from './widget'
+import image from './image'
 
 const router = new Router()
 
@@ -37,5 +38,6 @@ router.use('/questions', question)
 router.use('/discover', discover)
 router.use('/categories', category)
 router.use('/widget', widget)
+router.use('/images', image)
 
 export default router
