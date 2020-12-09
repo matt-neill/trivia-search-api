@@ -22,7 +22,7 @@ const uploadFile = multer({ storage });
 
 const router = new Router();
 const {
-  public_id, version, signature, width, height, format, resource_type, url, secure_url,
+  public_id, version, signature, width, height, format, resource_type, url, secure_url, name,
 } = schema.tree;
 
 /**

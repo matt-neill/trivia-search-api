@@ -14,7 +14,7 @@ export const create = ({ user, bodymen: { body } }, res, next) => {
 };
 
 export const show = ({ params }, res, next) => Widget.findOne({ createdBy: params.userId })
-  .populate('createdBy')
+  .populate('createdBy media')
   .then(notFound(res))
   .then((widget) => (widget ? widget.view() : null))
   .then(success(res))

@@ -43,6 +43,10 @@ const categorySchema = new Schema({
     type: Boolean,
     default: false,
   },
+  color: {
+    type: String,
+    default: '#EAEAEA',
+  },
   sortOrder: {
     type: Number,
   },
@@ -68,6 +72,7 @@ categorySchema.methods = {
         hero: this.media.hero,
       },
       slug: this.slug,
+      color: this.color,
       sortOrder: this.sortOrder,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt,

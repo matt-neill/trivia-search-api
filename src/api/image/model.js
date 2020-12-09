@@ -1,69 +1,73 @@
-import mongoose, { Schema } from 'mongoose'
+import mongoose, { Schema } from 'mongoose';
 
 const imageSchema = new Schema({
   createdBy: {
     type: Schema.ObjectId,
     ref: 'User',
-    required: true
+    required: true,
   },
   public_id: {
-    type: String
+    type: String,
   },
   version: {
-    type: String
+    type: String,
   },
   signature: {
-    type: String
+    type: String,
   },
   width: {
-    type: String
+    type: String,
   },
   height: {
-    type: String
+    type: String,
   },
   format: {
-    type: String
+    type: String,
   },
   resource_type: {
-    type: String
+    type: String,
   },
   url: {
-    type: String
+    type: String,
   },
   secure_url: {
-    type: String
-  }
+    type: String,
+  },
+  name: {
+    type: String,
+  },
 }, {
-  timestamps: true
-})
+  timestamps: true,
+});
 
 imageSchema.methods = {
-  view (full) {
+  view(full) {
     const view = {
       // simple view
       id: this.id,
-      createdBy: this.createdBy.view(full),
       public_id: this.public_id,
-      version: this.version,
-      signature: this.signature,
+      name: this.name,
       width: this.width,
       height: this.height,
       format: this.format,
-      resource_type: this.resource_type,
       url: this.url,
       secure_url: this.secure_url,
       createdAt: this.createdAt,
-      updatedAt: this.updatedAt
-    }
+      updatedAt: this.updatedAt,
+    };
 
     return full ? {
-      ...view
+      ...view,
+      version: this.version,
+      signature: this.signature,
+      resource_type: this.resource_type,
+      createdBy: this.createdBy.view(true),
       // add properties for a full view
-    } : view
-  }
-}
+    } : view;
+  },
+};
 
-const model = mongoose.model('Image', imageSchema)
+const model = mongoose.model('Image', imageSchema);
 
-export const schema = model.schema
-export default model
+export const { schema } = model;
+export default model;

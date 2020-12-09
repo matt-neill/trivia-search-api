@@ -16,10 +16,11 @@ cloudinary.config({
 });
 
 export const create = ({ user, file }, res, next) => {
+  console.log(file);
   cloudinary.uploader.upload(file.path, (err, image) => {
     if (image) {
       fs.unlinkSync(file.path);
-      Image.create({ ...image, createdBy: user })
+      Image.create({ ...image, name: file.originalname, createdBy: user })
         .then((imageDoc) => imageDoc.view())
         .then(success(res, 201))
         .catch(next);

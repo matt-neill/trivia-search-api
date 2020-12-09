@@ -29,6 +29,10 @@ const widgetSchema = new Schema({
     type: Object,
     default: new Font('DIN Condensed', '#333', 700),
   },
+  media: {
+    type: Schema.ObjectId,
+    ref: 'Image',
+  },
   createdBy: {
     type: Schema.ObjectId,
     ref: 'User',
@@ -50,6 +54,7 @@ widgetSchema.methods = {
       questionNumber: this.questionNumber,
       headingFont: this.headingFont,
       questionFont: this.questionFont,
+      media: this.media && this.media.view(),
       createdAt: this.createdAt,
       updatedAt: this.updatedAt,
     };
