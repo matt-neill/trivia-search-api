@@ -47,7 +47,13 @@ router.post('/',
  */
 router.get('/',
   token({ required: true }),
-  query(),
+  query({
+    hideCustom: {
+      type: Boolean,
+      paths: ['isCustomCategory'],
+      operator: '$nin',
+    },
+  }),
   index);
 
 /**

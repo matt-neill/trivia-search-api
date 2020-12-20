@@ -1,6 +1,7 @@
 import OpenTriviaAPI from 'opentdb-api';
 import mongoose from 'mongoose';
 import e from 'express';
+import jService from 'jservice-node';
 import { sign, verify } from '../../services/jwt';
 import { notFound } from '../../services/response';
 import { User } from '../user';
@@ -131,6 +132,25 @@ export const resetToken = ({ user }, res, next) => getTokenfromJwt(user)
     const error = parseError(err.message);
     return res.status(error.status).send(error);
   });
+
+export const getJServiceQuestions = ({ querymen: { query } }, res) => (
+  jService.random(query.count, (error, response, clues) => {
+    if (error) {
+      return res.status(error.status).send(error);
+    }
+    if (!error && response.statusCode === 200) {
+      const results = clues.map((question) => ({
+        difficulty: question.value,
+        question: question.question,
+        correct_answer: question.answer,
+        incorrect_answers: [],
+        tags: [question.category.title],
+      }));
+      return res.status(200).json(results);
+    }
+    return res.status(204);
+  })
+);
 
 export const getBalancedQuestions = ({ querymen: { query, cursor }, user }, res) => (
   checkToken(user, res)

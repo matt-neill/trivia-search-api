@@ -73,6 +73,7 @@ categorySchema.methods = {
       },
       slug: this.slug,
       color: this.color,
+      isCustomCategory: this.isCustomCategory,
       sortOrder: this.sortOrder,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt,
@@ -80,7 +81,6 @@ categorySchema.methods = {
 
     return full ? {
       ...view,
-      isCustomCategory: this.isCustomCategory,
       active: this.active,
       opentriviadb_categories: this.opentriviadb_categories,
       // add properties for a full view
@@ -90,7 +90,7 @@ categorySchema.methods = {
 
 categorySchema.pre('save', function (next) {
   if (!this.isModified('name')) return next();
-  this.slug = this.name.replace(' ').toLowerCase();
+  this.slug = this.name.replace(/ /g, '-').toLowerCase();
   return next();
 });
 

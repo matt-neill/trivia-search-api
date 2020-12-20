@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { middleware as query } from 'querymen';
 import { token } from '../../services/passport';
-import { index, getCategories, resetToken, getBalancedQuestions } from './controller';
+import { index, getCategories, resetToken, getBalancedQuestions, getJServiceQuestions } from './controller';
 
 const router = new Router();
 
@@ -57,6 +57,31 @@ router.get('/balanced',
     },
   }),
   getBalancedQuestions);
+
+router.get('/jeopardy',
+  token({ required: true }),
+  query({
+    count: {
+      type: Number,
+      default: 6,
+    },
+    // difficulty: {
+    //   type: Number,
+    // },
+    // category: {
+    //   type: Number,
+    // },
+    // min_date: {
+    //   type: Date,
+    // },
+    // max_date: {
+    //   type: Date,
+    // },
+    // offset: { // pagination
+    //   type: Number,
+    // },
+  }),
+  getJServiceQuestions);
 
 /**
  * @api {get} /discover/:id Retrieve discover
