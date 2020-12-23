@@ -2,6 +2,8 @@ import OpenTriviaAPI from 'opentdb-api';
 import mongoose from 'mongoose';
 import e from 'express';
 import jService from 'jservice-node';
+import request from 'request';
+import cheerio from 'cheerio';
 import { sign, verify } from '../../services/jwt';
 import { notFound } from '../../services/response';
 import { User } from '../user';
@@ -133,8 +135,26 @@ export const resetToken = ({ user }, res, next) => getTokenfromJwt(user)
     return res.status(error.status).send(error);
   });
 
-export const getJServiceQuestions = ({ querymen: { query } }, res) => (
-  jService.random(query.count, (error, response, clues) => {
+export const getJServiceQuestions = ({ querymen: { query } }, res) => {
+  if (query.categoryId) {
+    return jService.category(query.categoryId, (error, response, result) => {
+      if (error) {
+        return res.status(error.status).send(error);
+      }
+      if (!error && response.statusCode === 200) {
+        const results = result.clues.map((question) => ({
+          difficulty: question.value,
+          question: question.question,
+          correct_answer: question.answer,
+          incorrect_answers: [],
+        }));
+        return res.status(200).json(results);
+      }
+      return res.status(204);
+    });
+  }
+
+  return jService.random(query.count, (error, response, clues) => {
     if (error) {
       return res.status(error.status).send(error);
     }
@@ -149,8 +169,53 @@ export const getJServiceQuestions = ({ querymen: { query } }, res) => (
       return res.status(200).json(results);
     }
     return res.status(204);
-  })
-);
+  });
+};
+
+export const getJServiceCategories = ({ querymen: { query } }, res) => {
+  console.log(query);
+  request(`http://jservice.io/search?query=${query.keywords.source}`, (error, response, html) => {
+    if (!error && response.statusCode === 200) {
+      const $ = cheerio.load(html);
+      const rows = $('table.table tbody tr');
+
+      const rowData = [];
+      $(rows).each((idx, row) => {
+        const href = $(row).find('a').attr('href')
+          .replace(/\//g, '')
+          .replace('popular', '');
+        const category = $(row).find('td').first().text()
+          .trim();
+        const count = $(row).find('td').last().text()
+          .trim();
+        rowData.push({
+          id: parseInt(href, 10),
+          category,
+          count: parseInt(count, 10),
+        });
+      });
+      return res.status(200).json(rowData);
+    }
+  });
+};
+
+// export const getJServiceCategory = ({ params }, res) => {
+//   // jService.category(parseInt(params.category, 10), (error, response, result) => {
+//   //   if (error) {
+//   //     return res.status(error.status).send(error);
+//   //   }
+//   //   if (!error && response.statusCode === 200) {
+//   //     const results = result.clues.map((question) => ({
+//   //       difficulty: question.value,
+//   //       question: question.question,
+//   //       correct_answer: question.answer,
+//   //       incorrect_answers: [],
+//   //     }));
+//   //     return res.status(200).json(results);
+//   //   }
+//   //   return res.status(204);
+//   // });
+// }
 
 export const getBalancedQuestions = ({ querymen: { query, cursor }, user }, res) => (
   checkToken(user, res)

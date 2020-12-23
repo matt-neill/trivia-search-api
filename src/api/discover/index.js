@@ -1,7 +1,15 @@
 import { Router } from 'express';
 import { middleware as query } from 'querymen';
 import { token } from '../../services/passport';
-import { index, getCategories, resetToken, getBalancedQuestions, getJServiceQuestions } from './controller';
+import {
+  index,
+  getCategories,
+  resetToken,
+  getBalancedQuestions,
+  getJServiceQuestions,
+  getJServiceCategories,
+  getJServiceCategory,
+} from './controller';
 
 const router = new Router();
 
@@ -65,6 +73,9 @@ router.get('/jeopardy',
       type: Number,
       default: 6,
     },
+    categoryId: {
+      type: Number,
+    },
     // difficulty: {
     //   type: Number,
     // },
@@ -82,6 +93,11 @@ router.get('/jeopardy',
     // },
   }),
   getJServiceQuestions);
+
+  router.get('/jeopardy/search',
+  token({ required: true }),
+  query(),
+  getJServiceCategories);
 
 /**
  * @api {get} /discover/:id Retrieve discover
