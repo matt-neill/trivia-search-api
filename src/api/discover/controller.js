@@ -9,7 +9,6 @@ import { notFound } from '../../services/response';
 import { User } from '../user';
 import { Category } from '../category';
 
-// const { ObjectId } = Schema.Types;
 const { ObjectId } = mongoose;
 
 const getErrorStatus = (code) => {
@@ -173,7 +172,6 @@ export const getJServiceQuestions = ({ querymen: { query } }, res) => {
 };
 
 export const getJServiceCategories = ({ querymen: { query } }, res) => {
-  console.log(query);
   request(`http://jservice.io/search?query=${query.keywords.source}`, (error, response, html) => {
     if (!error && response.statusCode === 200) {
       const $ = cheerio.load(html);

@@ -6,10 +6,17 @@ import parseFile from './parse';
 import parseText from '../../utils/parseText';
 import titleCase from '../../utils/titleCase';
 
-export const create = ({ bodymen: { body }, user }, res, next) => Question.create({ ...body, createdBy: user })
-  .then((question) => question.view(true))
-  .then(success(res, 201))
-  .catch(next);
+export const create = ({ bodymen: { body }, user }, res, next) => {
+  const newQuestion = {
+    ...body,
+    options: body.options.length > 1 ? body.options.map((option) => (Array.isArray(option) ? option.join(', ') : option)) : [],
+  };
+
+  return Question.create({ ...newQuestion, createdBy: user })
+    .then((question) => question.view(true))
+    .then(success(res, 201))
+    .catch(next);
+};
 
 export const createMultiple = ({ body, user }, res, next) => {
   const p = [];
@@ -68,9 +75,15 @@ export const update = ({ bodymen: { body }, params, user }, res, next) => {
     query.createdBy = user;
   }
 
+  const updatedQuestion = {
+    ...body,
+    options: body.options.length && body.options.map((option) => (Array.isArray(option) ? option.join(', ') : option)),
+    updatedAt: new Date(),
+  };
+
   return Question.findOne(query)
     .then(notFound(res))
-    .then((question) => (question ? Object.assign(question, Object.assign(body, { updatedAt: new Date() })).save() : null))
+    .then((question) => (question ? Object.assign(question, updatedQuestion).save() : null))
     .then((question) => (question ? question.view(true) : null))
     .then(success(res))
     .catch(next);
