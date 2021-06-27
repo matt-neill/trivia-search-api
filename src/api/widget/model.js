@@ -17,6 +17,14 @@ const widgetSchema = new Schema({
     type: String,
     required: true,
   },
+  answer: {
+    type: String,
+    required: true,
+  },
+  answerVisible: {
+    type: Boolean,
+    default: false,
+  },
   questionNumber: {
     type: Number,
     required: true,
@@ -49,6 +57,8 @@ widgetSchema.methods = {
       id: this.id,
       createdBy: this.createdBy.view(),
       questionId: this.questionId,
+      answer: this.answer,
+      answerVisible: this.answerVisible,
       roundName: this.roundName,
       question: this.question,
       questionNumber: this.questionNumber,

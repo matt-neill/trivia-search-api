@@ -8,7 +8,7 @@ export Widget, { schema } from './model';
 
 const router = new Router();
 const {
-  questionId, roundName, question, headingFont, questionFont, questionNumber, media,
+  questionId, roundName, question, answer, answerVisible, headingFont, questionFont, questionNumber, media,
 } = schema.tree;
 
 /**
@@ -30,7 +30,7 @@ const {
 router.post('/',
   token({ required: true }),
   body({
-    questionId, roundName, question, headingFont, questionFont, questionNumber, media,
+    questionId, roundName, question, answer, answerVisible, headingFont, questionFont, questionNumber, media,
   }),
   create);
 

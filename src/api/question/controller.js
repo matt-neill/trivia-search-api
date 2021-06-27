@@ -77,7 +77,7 @@ export const update = ({ bodymen: { body }, params, user }, res, next) => {
 
   const updatedQuestion = {
     ...body,
-    options: body.options.length && body.options.map((option) => (Array.isArray(option) ? option.join(', ') : option)),
+    options: body.options.length ? body.options.map((option) => (Array.isArray(option) ? option.join(', ') : option)) : [],
     updatedAt: new Date(),
   };
 
